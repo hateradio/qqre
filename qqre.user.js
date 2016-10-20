@@ -34,6 +34,9 @@
 
 /*
 
+## 10
+* **New**: Emoji toolbar to toggle which emoji to display
+
 Changes
 ## 9.0.2
 * **FIX**: HTTPS for NeoGAF
@@ -130,6 +133,7 @@ Changes
 	var $, greaseWindow, strg, update, Extra, Editor, Form, app, bond, emoji;
 
 	if (!String.prototype.trim) { String.prototype.trim = function () { return this.replace(/^\s+|\s+$/g, ''); }; }
+	if (!Array.from) { Array.from = function (list) { return Array.prototype.slice.call(list); }; }
 
 	bond = function (o, m) { return function () { return m.apply(o, arguments); }; };
 
@@ -282,11 +286,12 @@ Changes
 			}
 		}
 
-		Extra.buttons = ['Spoiler', 'Highlight', 'Strike'];
+		Extra.buttons = ['Spoiler', 'Highlight', 'Strike', 'NoParse'];
 		Extra.images  = [
 			'/forum/images/neogaf2/misc/spoiler.gif',
 			'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAUCAYAAABiS3YzAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2RpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo0QTZDNkZFMTMxOEFFMDExOEQ0RTk2MjY1NjVFQUVDQiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0I5QzRFMjhBMzUxMUUwOEVEMUQ5RkU1NzlCRTAwRiIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0I5QzRFMThBMzUxMUUwOEVEMUQ5RkU1NzlCRTAwRiIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IFdpbmRvd3MiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0QTZDNkZFMTMxOEFFMDExOEQ0RTk2MjY1NjVFQUVDQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0QTZDNkZFMTMxOEFFMDExOEQ0RTk2MjY1NjVFQUVDQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PkUW7xgAAAB/SURBVHjaYvz//z8DtQETAw3ACDeUBZfEGUX1AiDljyZ8F4iVkfkm92+mEG0oEEwA4jggNoTyFYD4IRB/A2JOIP4OxI7keP8jEvshlP6JRg9wmGIB76E0PzVjXxCKP46MxA9Kp+pA/AGKzwHxHKjcByg9B5tGxtFSagQbChBgAHoVG8AVO051AAAAAElFTkSuQmCC',
-			'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAUCAYAAABiS3YzAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2RpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo0QTZDNkZFMTMxOEFFMDExOEQ0RTk2MjY1NjVFQUVDQiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpCRjk5MzM3NjhBMzQxMUUwOTcxNkNDQzlBQjRERDVEMCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpCRjk5MzM3NThBMzQxMUUwOTcxNkNDQzlBQjRERDVEMCIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IFdpbmRvd3MiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0QTZDNkZFMTMxOEFFMDExOEQ0RTk2MjY1NjVFQUVDQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0QTZDNkZFMTMxOEFFMDExOEQ0RTk2MjY1NjVFQUVDQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PpIU3swAAAEzSURBVHjaYvz//z8DtQETAw3AqKG4QVhoKIOEuHgBIyPjfhDW09PrB/LXg8TxAlDs48Ia6ur1ICXiYmIOSkpKCkD2ekFBwf+hISF49eF16ZevXx1AtLqGhoKxkdEDOzu7RCD3AyHvM6KnUycnJzj74cOH8+/du5cAYsvIyBzQ09VtfPny5Qc+fv4LMDX79u3DMJQFh2VbgNhbXl6eAYShwOH7jx8OQANh/K1A7INNMy5DwYpFhIUNvn79+uDS5csJT548yQcKgcKVwcXZOfHvv38LyIr94ydO9P/69ctAVVV1gqOjoyIwksAGAS2Sx6cPw6XIYSQrK8tw9ty5fmAkBQINfMDGynoRJM7KxnYQW1gS8j4cAF36YM/eveeBTFDkKACTVyIQHyAp9kfz/ggyFCDAAMW7jH/4BUY6AAAAAElFTkSuQmCC'
+			'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAUCAYAAABiS3YzAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2RpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo0QTZDNkZFMTMxOEFFMDExOEQ0RTk2MjY1NjVFQUVDQiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpCRjk5MzM3NjhBMzQxMUUwOTcxNkNDQzlBQjRERDVEMCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpCRjk5MzM3NThBMzQxMUUwOTcxNkNDQzlBQjRERDVEMCIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IFdpbmRvd3MiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0QTZDNkZFMTMxOEFFMDExOEQ0RTk2MjY1NjVFQUVDQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0QTZDNkZFMTMxOEFFMDExOEQ0RTk2MjY1NjVFQUVDQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PpIU3swAAAEzSURBVHjaYvz//z8DtQETAw3AqKG4QVhoKIOEuHgBIyPjfhDW09PrB/LXg8TxAlDs48Ia6ur1ICXiYmIOSkpKCkD2ekFBwf+hISF49eF16ZevXx1AtLqGhoKxkdEDOzu7RCD3AyHvM6KnUycnJzj74cOH8+/du5cAYsvIyBzQ09VtfPny5Qc+fv4LMDX79u3DMJQFh2VbgNhbXl6eAYShwOH7jx8OQANh/K1A7INNMy5DwYpFhIUNvn79+uDS5csJT548yQcKgcKVwcXZOfHvv38LyIr94ydO9P/69ctAVVV1gqOjoyIwksAGAS2Sx6cPw6XIYSQrK8tw9ty5fmAkBQINfMDGynoRJM7KxnYQW1gS8j4cAF36YM/eveeBTFDkKACTVyIQHyAp9kfz/ggyFCDAAMW7jH/4BUY6AAAAAElFTkSuQmCC',
+			'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAUCAYAAABiS3YzAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RkM5NjZBNUEyNTI4MTFFNkI5OUE5QzcyOTIzQkVGRTMiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RkM5NjZBNUIyNTI4MTFFNkI5OUE5QzcyOTIzQkVGRTMiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpGQzk2NkE1ODI1MjgxMUU2Qjk5QTlDNzI5MjNCRUZFMyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpGQzk2NkE1OTI1MjgxMUU2Qjk5QTlDNzI5MjNCRUZFMyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PuG5jzQAAAJXSURBVHja5FS9T1pRFP89eMiTFq3ERKoMJDYOLxpCcOlSh9q4GD82HWpZaB0dXWypk39CKw6NU7cyuJjapQuLFkkTNH6gSQv4OkgJ6EPg8Tzn1TYQAiRNnXqTk3vfOb/ze+frXkHXdfzrZcItrFshFWu+Xjyp/pJJZkjGSbw3uijJBsl7kvgf5NuPjUkrmgbT2Bgqm5sBWCzLQm+vU+jpAbq6fgEyGa+uKF49lQqgVHpJ2BBh69IVqhtV9D/iLSDY7avmgQH8TCZxHoshe3Bg2DtJ5/B4cK+vDxrp9FzuOalDbe8+N66pVirJFWDZ7Hbjx+4uvoXDkYuTk2e+pSWBhc5hRyYDk9MJxjCWfZo2qlQszsDhcOZSKZxvb0csVutTz8LCOgoFIBIJekZGpjA6ip3FRTCGsYZPM9JysTgudnTgIpFAmyS9kf3+Y6gqtScaJPOr34Sd3d1hxjCWfZpHenXlFS0WaJTig4mJdbhcwP5+DSGt12SbZgxj2adV+uDIrDabsWNrq47QNzsbrMYYPi0ijRYUBXccDmT39j7UEU5OBnF5ybY5xjCWfVrVdCOXTkOSJK7bVA3hyooRoaoo/VTvecYwln3QbE7jHrtsFsVPLrfbaRsexpe1NVDHw6KuTxs/FYQ52uYpkodqNovvp6dnWrn8WI7l4g1Jv8qSMfxSe/vqfRrwu3yTqBkwm28GWaMalZCnJqXpYhRU1Rj+oXihSfrlMoYGB0N5uimJw8Oz5NER8pQiXU9D+Mw6tjGGsezTNP2dfuGvHhTfsd6Y9P97pK8FGADMrzoLJkd3DQAAAABJRU5ErkJggg=='
 		];
 		Extra.ctrl = { b: 'b', i: 'i', u: 'u', s: 'Strike', h: 'Highlight', p: 'Spoiler', l: 'url', m: 'img', e: 'save', d: 'clear' };
 		Extra.mac = /(?:mac)/i.test(navigator.platform);
@@ -362,9 +367,11 @@ Changes
 		};
 		return Extra;
 	}());
-	update.css('td.imgbtnemu div:hover { border:1px solid #316ac5; margin: -1px; background: #c1d2ee; } td.imgbtnemu div:active { background: #98b5e2; } #vB_Editor_001_cmd_wrap0_spoiler { visibility:hidden !important } .quickreplyform_hotspot{text-align:center;margin-top:6px} .text_emo_container { text-align: center; margin-top: 8px; } .text_emo_container > div {vertical-align: top} .text_emo_container .text_emo_container_text {display:inline-block;margin: 0 0 0 4%;width:70%} .text_emo_container .text_emo_container_emo {width:18%;margin: 0 0 0 1%;display:inline-block;overflow:hidden} .text_emo_container_text textarea {width:99%} .gm_emoji {height:157px;overflow: auto;resize:both} .gm_emoji a {font-size:18px;line-height:1.2;cursor:pointer}');
+	update.css('td.imgbtnemu div:hover { border:1px solid #316ac5; margin: -1px; background: #c1d2ee; } td.imgbtnemu div:active { background: #98b5e2; } #vB_Editor_001_cmd_wrap0_spoiler { visibility:hidden !important } .quickreplyform_hotspot{text-align:center;margin-top:6px} .text_emo_container { text-align: center; margin-top: 8px; } .text_emo_container > div {vertical-align: top} .text_emo_container .text_emo_container_text {display:inline-block;margin: 0 0 0 4%;width:70%} .text_emo_container .text_emo_container_emo {width:18%;margin: 0 0 0 1%;display:inline-block;overflow:hidden} .text_emo_container_text textarea {width:99%} .gm_emoji {height:157px;line-height: 1.2;overflow: hidden;resize:both} .gm_emoji a {font-size:12px;line-height:1.2;cursor:pointer} .gm_emoji_list {height: 125px; overflow: auto; } .gm_emoji_toolbar { margin-bottom: 4px }');
 
 	// Emoji Stuff <3 OSX 10.9+ Command+Control+Space
+	// http://konieczny.be/article/utf.php
+	// http://apps.timwhitlock.info/emoji/tables/unicode
 	emoji = {
 		div: null,
 		dbGenerator: function (ranges) {
@@ -378,28 +385,77 @@ Changes
 
 			return list;
 		},
+		presentation: {
+			nameReg: /([A-Z])/g,
+			readableName: function (name) {
+				var title = name.replace(emoji.presentation.nameReg,  ' $1');
+				title = title[0].toUpperCase() + title.slice(1);
+
+				return title;
+			},
+			toolbarIcon: function (point, name) {
+				var b = document.createElement('div');
+				b.innerHTML = '&#x' + point + ';';
+				b.setAttribute('data-toolbar', name);
+				b.title = emoji.presentation.readableName(name);
+				b.className = 'gm_emoji_toolbar_button';
+				return b;
+			},
+			icon: function (point) {
+				var a = document.createElement('a');
+				a.innerHTML = '&#x' + point + ';';
+				a.setAttribute('data-char', a.innerHTML);
+				a.title = 'U+' + point; // a.innerHTML;
+				a.href = 'https://codepoints.net/U+' + point;
+				return a;
+			},
+			panel: function (div) {
+				var e, i, l, f = document.createDocumentFragment(), innerDiv, innerFragment, toolbar, hide = false,
+					unique = function (a, x) { return ~a.indexOf(x) ? a : a.concat(x); };
+
+				toolbar = document.createElement('div');
+				toolbar.className = 'gm_emoji_toolbar';
+
+				for (e in emoji.db) {
+					if (emoji.db.hasOwnProperty(e)) {
+						innerFragment = document.createDocumentFragment();
+
+						innerDiv = document.createElement('div');
+
+						if (hide) {
+							innerDiv.className = 'gm_emoji_list gm_emoji_hidden gm_emoji_' + e;
+						} else {
+							hide = true;
+							innerDiv.className = 'gm_emoji_list gm_emoji_' + e;
+						}
+
+						l = emoji.db[e].reduce(unique, []);
+						for (i = 0; i < l.length; i++) {
+							if (i === 0) {
+								toolbar.appendChild(emoji.presentation.toolbarIcon(l[i], e));
+								toolbar.appendChild(document.createTextNode(' '));
+							}
+							innerFragment.appendChild(emoji.presentation.icon(l[i]));
+							innerFragment.appendChild(document.createTextNode(' '));
+						}
+					}
+
+					innerDiv.appendChild(innerFragment);
+					f.appendChild(innerDiv);
+				}
+				div.appendChild(toolbar);
+				div.appendChild(f);
+			}
+		},
 		db: {
-			faces: ['1f604', '1f603', '1f600', '1f60a', /*'263a',*/ '1f609', '1f60d', '1f618', '1f61a', '1f617', '1f619', '1f61c', '1f61d', '1f61b', '1f633', '1f601', '1f614', '1f60c', '1f612', '1f61e', '1f623', '1f622', '1f602', '1f62d', '1f62a', '1f625', '1f630', '1f605', '1f613', '1f629', '1f62b', '1f628', '1f631', '1f620', '1f621', '1f624', '1f616', '1f606', '1f60b', '1f637', '1f60e', '1f634', '1f635', '1f632', '1f61f', '1f626', '1f627', '1f608', '1f47f', '1f62e', '1f62c', '1f610', '1f615', '1f62f', '1f636', '1f607', '1f60f', '1f611', '1f472', '1f473', '1f46e', '1f477', '1f482', '1f476', '1f466', '1f467', '1f468', '1f469', '1f474', '1f475', '1f471', '1f47c', '1f478'],
-			cats: ['1f63a', '1f638', '1f63b', '1f63d', '1f63c', '1f640', '1f63f', '1f639', '1f63e'],
-			otherFaces: ['1f479', '1f47a', '1f648', '1f649', '1f64a', '1f480', '1f47d', '1f4a9'],
-			misc: ['1f525', '2728', '1f31f', '1f4ab', '1f4a5', '1f4a2', '1f4a6', '1f4a7', '1f4a4', '1f4a8', '1f442', '1f440', '1f443', '1f445', '1f444', '1f44d', '1f44e', '1f44c', '1f44a', '270a', '270c', '1f44b', '270b', '1f450', '1f446', '1f447', '1f449', '1f448', '1f64c', '1f64f', '261d', '1f44f', '1f4aa', '1f6b6', '1f3c3', '1f483', '1f46b', '1f46a', '1f46c', '1f46d', '1f48f', '1f491', '1f46f', '1f646', '1f645', '1f481', '1f64b', '1f486', '1f487', '1f485', '1f470', '1f64e', '1f64d', '1f647'],
-			fashion: ['1f3a9', '1f451', '1f452', '1f45f', '1f45e', '1f461', '1f460', '1f462', '1f455', '1f454', '1f45a', '1f457', '1f3bd', '1f456', '1f458', '1f459', '1f4bc', '1f45c', '1f45d', '1f45b', '1f453', '1f380', '1f302', '1f484'],
-			hearts: ['1f49b', '1f499', '1f49c', '1f49a', '2764', '1f494', '1f497', '1f493', '1f495', '1f496', '1f49e', '1f498', '1f48c', '1f48b', '1f48d', '1f48e', '1f464', '1f465', '1f4ac', '1f463', '1f4ad'],
-			animals: ['1f436', '1f43a', '1f431', '1f42d', '1f439', '1f430', '1f438', '1f42f', '1f428', '1f43b', '1f437', '1f43d', '1f42e', '1f417', '1f435', '1f412', '1f434', '1f411', '1f418', '1f43c', '1f427', '1f426', '1f424', '1f425', '1f423', '1f414', '1f40d', '1f422', '1f41b', '1f41d', '1f41c', '1f41e', '1f40c', '1f419', '1f41a', '1f420', '1f41f', '1f42c', '1f433', '1f40b', '1f404', '1f40f', '1f400', '1f403', '1f405', '1f407', '1f409', '1f40e', '1f410', '1f413', '1f415', '1f416', '1f401', '1f402', '1f432', '1f421', '1f40a', '1f42b', '1f42a', '1f406', '1f408', '1f429', '1f43e'],
-			plants: ['1f490', '1f338', '1f337', '1f340', '1f339', '1f33b', '1f33a', '1f341', '1f343', '1f342', '1f33f', '1f33e', '1f344', '1f335', '1f334', '1f332', '1f333', '1f330', '1f331', '1f33c'],
-			weather: ['1f310', '1f31e', '1f31d', '1f31a', '1f311', '1f312', '1f313', '1f314', '1f315', '1f316', '1f317', '1f318', '1f31c', '1f31b', '1f319', '1f30d', '1f30e', '1f30f', '1f30b', '1f30c', '1f320', '2b50', '2600', '26c5', '2601', '26a1', '2614', '2744', '26c4', '1f300', '1f301', '1f308', '1f30a'],
-			items: ['1f38d', '1f49d', '1f38e', '1f392', '1f393', '1f38f', '1f386', '1f387', '1f390', '1f391', '1f383', '1f47b', '1f385', '1f384', '1f381', '1f38b', '1f389', '1f38a', '1f388', '1f38c', '1f52e', '1f3a5', '1f4f7', '1f4f9', '1f4fc', '1f4bf', '1f4c0', '1f4bd', '1f4be', '1f4bb', '1f4f1', '260e', '1f4de', '1f4df', '1f4e0', '1f4e1', '1f4fa', '1f4fb', '1f50a', '1f509', '1f508', '1f507', '1f514', '1f515', '1f4e2', '1f4e3', '23f3', '231b', '23f0', '231a', '1f513', '1f512', '1f50f', '1f510', '1f511', '1f50e', '1f4a1', '1f526', '1f506', '1f505', '1f50c', '1f50b', '1f50d', '1f6c1', '1f6c0', '1f6bf', '1f6bd', '1f527', '1f529', '1f528', '1f6aa', '1f6ac', '1f4a3', '1f52b', '1f52a', '1f48a', '1f489', '1f4b0', '1f4b4', '1f4b5', '1f4b7', '1f4b6', '1f4b3', '1f4b8', '1f4f2'],
-			stationary: ['1f4e7', '1f4e5', '1f4e4', '2709', '1f4e9', '1f4e8', '1f4ef', '1f4eb', '1f4ea', '1f4ec', '1f4ed', '1f4ee', '1f4e6', '1f4dd', '1f4c4', '1f4c3', '1f4d1', '1f4ca', '1f4c8', '1f4c9', '1f4dc', '1f4cb', '1f4c5', '1f4c6', '1f4c7', '1f4c1', '1f4c2', '2702', '1f4cc', '1f4ce', '2712', '270f', '1f4cf', '1f4d0', '1f4d5', '1f4d7', '1f4d8', '1f4d9', '1f4d3', '1f4d4', '1f4d2', '1f4da', '1f4d6', '1f516', '1f4db', '1f52c', '1f52d', '1f4f0'],
-			musicArt: ['1f3a8', '1f3ac', '1f3a4', '1f3a7', '1f3bc', '1f3b5', '1f3b6', '1f3b9', '1f3bb', '1f3ba', '1f3b7', '1f3b8'],
-			sportsGames: ['1f47e', '1f3ae', '1f0cf', '1f3b4', '1f004', '1f3b2', '1f3af', '1f3c8', '1f3c0', '26bd', '26be', '1f3be', '1f3b1', '1f3c9', '1f3b3', '26f3', '1f6b5', '1f6b4', '1f3c1', '1f3c7', '1f3c6', '1f3bf', '1f3c2', '1f3ca', '1f3c4', '1f3a3'],
-			foods: ['2615', '1f375', '1f376', '1f37c', '1f37a', '1f37b', '1f378', '1f379', '1f377', '1f374', '1f355', '1f354', '1f35f', '1f357', '1f356', '1f35d', '1f35b', '1f364', '1f371', '1f363', '1f365', '1f359', '1f358', '1f35a', '1f35c', '1f372', '1f362', '1f361', '1f373', '1f35e', '1f369', '1f36e', '1f366', '1f368', '1f367', '1f382', '1f370', '1f36a', '1f36b', '1f36c', '1f36d', '1f36f'],
-			fruits: ['1f34e', '1f34f', '1f34a', '1f34b', '1f352', '1f347', '1f349', '1f353', '1f351', '1f348', '1f34c', '1f350', '1f34d', '1f360', '1f346', '1f345', '1f33d'],
-			buildings: ['1f3e0', '1f3e1', '1f3eb', '1f3e2', '1f3e3', '1f3e5', '1f3e6', '1f3ea', '1f3e9', '1f3e8', '1f492', '26ea', '1f3ec', '1f3e4', '1f307', '1f306', '1f3ef', '1f3f0', '26fa', '1f3ed', '1f5fc', '1f5fe', '1f5fb', '1f304', '1f305', '1f303', '1f5fd', '1f309', '1f3a0', '1f3a1', '26f2', '1f3a2', '1f6a2'],
-			transport: ['26f5', '1f6a4', '1f6a3', '2693', '1f680', '2708', '1f4ba', '1f681', '1f682', '1f68a', '1f689', '1f69e', '1f686', '1f684', '1f685', '1f688', '1f687', '1f69d', '1f68b', '1f683', '1f68e', '1f68c', '1f68d', '1f699', '1f698', '1f697', '1f695', '1f696', '1f69b', '1f69a', '1f6a8', '1f693', '1f694', '1f692', '1f691', '1f690', '1f6b2', '1f6a1', '1f69f', '1f6a0', '1f69c', '1f488', '1f68f', '1f3ab', '1f6a6', '1f6a5', '26a0', '1f6a7', '1f530', '26fd', '1f3ee', '1f3b0', '2668', '1f5ff', '1f3aa', '1f3ad', '1f4cd', '1f6a9'],
-			arrows: ['1f51f', '1f522', /*'20e3',*/ '1f523', '2b06', '2b07', '2b05', '27a1', '1f520', '1f521', '1f524', '2197', '2196', '2198', '2199', '2194', '2195', '1f504', '25c0', '25b6', '1f53c', '1f53d', '21a9', '21aa', '2139', '23ea', '23e9', '23eb', '23ec', '2935', '2934'],
-			textLabels: ['1f197', '1f500', '1f501', '1f502', '1f195', '1f199', '1f192', '1f193', '1f196', '1f4f6', '1f3a6', '1f201', '1f22f', '1f233', '1f235', '1f234', '1f232', '1f250', '1f239', '1f23a', '1f236', '1f21a', '1f6bb', '1f6b9', '1f6ba', '1f6bc', '1f6be', '1f6b0', '1f6ae', '1f17f', '267f', '1f6ad', '1f237', '1f238', '1f202', '24c2', '1f6c2', '1f6c4', '1f6c5', '1f6c3', '1f251', '3299', '3297', '1f191', '1f198', '1f194', '1f6ab', '1f51e', '1f4f5', '1f6af', '1f6b1', '1f6b3', '1f6b7', '1f6b8', '26d4', '2733', '2747', '274e', '2705', '2734', '1f49f', '1f19a', '1f4f3', '1f4f4', '1f170', '1f171', '1f18e', '1f17e', '1f4a0', '27bf', '267b'],
-			zodiac: ['2648', '2649', '264a', '264b', '264c', '264d', '264e', '264f', '2650', '2651', '2652', '2653', '26ce'],
-			symbols: ['1f52f', '1f3e7', '1f4b9', '1f4b2', '1f4b1', 'a9', 'ae', '2122', '274c', '203c', '2049', '2757', '2753', '2755', '2754', '2b55', '1f51d', '1f51a', '1f519', '1f51b', '1f51c', '1f503', '1f55b', '1f567', '1f550', '1f55c', '1f551', '1f55d', '1f552', '1f55e', '1f553', '1f55f', '1f554', '1f560', '1f555', '1f556', '1f557', '1f558', '1f559', '1f55a', '1f561', '1f562', '1f563', '1f564', '1f565', '1f566', '2716', '2795', '2796', '2797', '2660', '2665', '2663', '2666', '1f4ae', '1f4af', '2714', '2611', '1f518', '1f517', '27b0', '3030', '303d', '1f531', '25fc', '25fb', '25fe', '25fd', '25aa', '25ab', '1f53a', '1f532', '1f533', '26ab', '26aa', '1f534', '1f535', '1f53b', '2b1c', '2b1b', '1f536', '1f537', '1f538', '1f539'],
+			smileysPeople: ["1F600", "1F601", "1F602", "1F603", "1F604", "1F605", "1F606", "1F609", "1F60A", "1F60B", "1F60E", "1F60D", "1F618", "1F617", "1F619", "1F61A", "263A", "1F642", "1F917", "1F914", "1F610", "1F611", "1F636", "1F644", "1F60F", "1F623", "1F625", "1F62E", "1F910", "1F62F", "1F62A", "1F62B", "1F634", "1F60C", "1F913", "1F61B", "1F61C", "1F61D", "1F612", "1F613", "1F614", "1F615", "1F643", "1F911", "1F632", "2639", "1F641", "1F616", "1F61E", "1F61F", "1F624", "1F622", "1F62D", "1F626", "1F627", "1F628", "1F629", "1F62C", "1F630", "1F631", "1F633", "1F635", "1F621", "1F620", "1F607", "1F637", "1F912", "1F915", "1F608", "1F47F", "1F479", "1F47A", "1F480", "1F47B", "1F47D", "1F916", "1F4A9", "1F63A", "1F638", "1F639", "1F63B", "1F63C", "1F63D", "1F640", "1F63F", "1F63E", "1F466", "1F467", "1F468", "1F469", "1F474", "1F475", "1F476", "1F47C", "1F46E", "1F575", "1F482", "1F477", "1F473", "1F471", "1F385", "1F478", "1F470", "1F472", "1F64D", "1F64E", "1F645", "1F646", "1F481", "1F64B", "1F647", "1F486", "1F487", "1F6B6", "1F3C3", "1F483", "1F46F", "1F574", "1F5E3", "1F464", "1F465", "1F46B", "1F46C", "1F46D", "1F48F", "1F468;&#x200D;&#x2764;&#xFE0F;&#x200D;&#x1F48B;&#x200D;&#x1F468", "1F469;&#x200D;&#x2764;&#xFE0F;&#x200D;&#x1F48B;&#x200D;&#x1F469", "1F491", "1F468;&#x200D;&#x2764;&#xFE0F;&#x200D;&#x1F468", "1F469;&#x200D;&#x2764;&#xFE0F;&#x200D;&#x1F469", "1F46A", "1F468;&#x200D;&#x1F469;&#x200D;&#x1F467", "1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466", "1F468;&#x200D;&#x1F469;&#x200D;&#x1F466;&#x200D;&#x1F466", "1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F467", "1F468;&#x200D;&#x1F468;&#x200D;&#x1F466", "1F468;&#x200D;&#x1F468;&#x200D;&#x1F467", "1F468;&#x200D;&#x1F468;&#x200D;&#x1F467;&#x200D;&#x1F466", "1F468;&#x200D;&#x1F468;&#x200D;&#x1F466;&#x200D;&#x1F466", "1F468;&#x200D;&#x1F468;&#x200D;&#x1F467;&#x200D;&#x1F467", "1F469;&#x200D;&#x1F469;&#x200D;&#x1F466", "1F469;&#x200D;&#x1F469;&#x200D;&#x1F467", "1F469;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466", "1F469;&#x200D;&#x1F469;&#x200D;&#x1F466;&#x200D;&#x1F466", "1F469;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F467", "1F4AA", "1F448", "1F449", "261D", "1F446", "1F595", "1F447", "270C", "1F596", "1F918", "1F590", "270B", "1F44C", "1F44D", "1F44E", "270A", "1F44A", "1F44B", "1F44F", "270D", "1F450", "1F64C", "1F64F", "1F485", "1F442", "1F443", "1F463", "1F440", "1F441", "1F445", "1F444", "1F48B", "1F453", "1F576", "1F454", "1F455", "1F456", "1F457", "1F458", "1F459", "1F45A", "1F45B", "1F45C", "1F45D", "1F392", "1F45E", "1F45F", "1F460", "1F461", "1F462", "1F451", "1F452", "1F3A9", "1F393", "26D1", "1F484", "1F48D", "1F302", "1F4BC"],
+			animalsNature: ["1F648", "1F649", "1F64A", "1F4A5", "1F4A6", "1F4A8", "1F435", "1F412", "1F436", "1F415", "1F429", "1F43A", "1F431", "1F408", "1F981", "1F42F", "1F405", "1F406", "1F434", "1F40E", "1F984", "1F42E", "1F402", "1F403", "1F404", "1F437", "1F416", "1F417", "1F43D", "1F40F", "1F411", "1F410", "1F42A", "1F42B", "1F418", "1F42D", "1F401", "1F400", "1F439", "1F430", "1F407", "1F43F", "1F43B", "1F428", "1F43C", "1F43E", "1F983", "1F414", "1F413", "1F423", "1F424", "1F425", "1F426", "1F427", "1F54A", "1F438", "1F40A", "1F422", "1F40D", "1F432", "1F409", "1F433", "1F40B", "1F42C", "1F41F", "1F420", "1F421", "1F419", "1F41A", "1F980", "1F40C", "1F41B", "1F41C", "1F41D", "1F41E", "1F577", "1F578", "1F982", "1F490", "1F338", "1F4AE", "1F3F5", "1F339", "1F33A", "1F33B", "1F33C", "1F337", "1F331", "1F332", "1F333", "1F334", "1F335", "1F33E", "1F33F", "2618", "1F340", "1F341", "1F342", "1F343", "1F344", "1F330", "1F30D", "1F30E", "1F30F", "1F310", "1F311", "1F312", "1F313", "1F314", "1F315", "1F316", "1F317", "1F318", "1F319", "1F31A", "1F31B", "1F31C", "2600", "1F31D", "1F31E", "2B50", "1F31F", "1F320", "2601", "26C5", "26C8", "1F324", "1F325", "1F326", "1F327", "1F328", "1F329", "1F32A", "1F32B", "1F32C", "2602", "2614", "26A1", "2744", "2603", "2604", "1F525", "1F4A7", "1F30A", "1F384", "2728", "1F38B", "1F38D"],
+			foodDrink: ["1F347", "1F348", "1F349", "1F34A", "1F34B", "1F34C", "1F34D", "1F34E", "1F34F", "1F350", "1F351", "1F352", "1F353", "1F345", "1F346", "1F33D", "1F336", "1F344", "1F330", "1F35E", "1F9C0", "1F356", "1F357", "1F354", "1F35F", "1F355", "1F32D", "1F32E", "1F32F", "1F373", "1F372", "1F37F", "1F371", "1F358", "1F359", "1F35A", "1F35B", "1F35C", "1F35D", "1F360", "1F362", "1F363", "1F364", "1F365", "1F361", "1F366", "1F367", "1F368", "1F369", "1F36A", "1F382", "1F370", "1F36B", "1F36C", "1F36D", "1F36E", "1F36F", "1F37C", "2615", "1F375", "1F376", "1F37E", "1F377", "1F378", "1F379", "1F37A", "1F37B", "1F37D", "1F374"],
+			travelPlaces: ["1F3D4", "26F0", "1F30B", "1F5FB", "1F3D5", "1F3D6", "1F3DC", "1F3DD", "1F3DE", "1F3DF", "1F3DB", "1F3D7", "1F3D8", "1F3D9", "1F3DA", "1F3E0", "1F3E1", "1F3E2", "1F3E3", "1F3E4", "1F3E5", "1F3E6", "1F3E8", "1F3E9", "1F3EA", "1F3EB", "1F3EC", "1F3ED", "1F3EF", "1F3F0", "1F492", "1F5FC", "1F5FD", "26EA", "1F54C", "1F54D", "26E9", "1F54B", "26F2", "1F301", "1F303", "1F306", "1F307", "1F309", "1F30C", "1F3A0", "1F3A1", "1F3A2", "1F682", "1F683", "1F684", "1F685", "1F686", "1F687", "1F688", "1F689", "1F68A", "1F69D", "1F69E", "1F68B", "1F68C", "1F68D", "1F68E", "1F690", "1F691", "1F692", "1F693", "1F694", "1F695", "1F696", "1F697", "1F698", "1F69A", "1F69B", "1F69C", "1F6B2", "1F3CE", "1F3CD", "1F68F", "1F6E4", "26FD", "1F6A8", "1F6A5", "1F6A6", "1F6A7", "2693", "26F5", "1F6A4", "1F6F3", "26F4", "1F6E5", "1F6A2", "2708", "1F6E9", "1F6EB", "1F6EC", "1F4BA", "1F681", "1F69F", "1F6A0", "1F6A1", "1F680", "1F6F0", "1F391", "1F6A3", "1F4B4", "1F4B5", "1F4B6", "1F4B7", "1F5FF", "1F6C2", "1F6C3", "1F6C4", "1F6C5"],
+			objects: ["2620", "1F48C", "1F4A3", "1F573", "1F6CD", "1F4FF", "1F48E", "1F52A", "1F3FA", "1F5FA", "1F488", "1F5BC", "1F6CE", "1F6AA", "1F6CC", "1F6CF", "1F6CB", "1F6BD", "1F6BF", "1F6C1", "231B", "23F3", "231A", "23F0", "23F1", "23F2", "1F570", "1F321", "26F1", "1F388", "1F389", "1F38A", "1F38E", "1F38F", "1F390", "1F380", "1F381", "1F579", "1F4EF", "1F399", "1F39A", "1F39B", "1F4FB", "1F4F1", "1F4F2", "260E", "1F4DE", "1F4DF", "1F4E0", "1F50B", "1F50C", "1F4BB", "1F5A5", "1F5A8", "2328", "1F5B1", "1F5B2", "1F4BD", "1F4BE", "1F4BF", "1F4C0", "1F3A5", "1F39E", "1F4FD", "1F4FA", "1F4F7", "1F4F8", "1F4F9", "1F4FC", "1F50D", "1F50E", "1F52C", "1F52D", "1F4E1", "1F56F", "1F4A1", "1F526", "1F3EE", "1F4D4", "1F4D5", "1F4D6", "1F4D7", "1F4D8", "1F4D9", "1F4DA", "1F4D3", "1F4C3", "1F4DC", "1F4C4", "1F4F0", "1F5DE", "1F4D1", "1F516", "1F3F7", "1F4B0", "1F4B4", "1F4B5", "1F4B6", "1F4B7", "1F4B8", "1F4B3", "2709", "1F4E7", "1F4E8", "1F4E9", "1F4E4", "1F4E5", "1F4E6", "1F4EB", "1F4EA", "1F4EC", "1F4ED", "1F4EE", "1F5F3", "270F", "2712", "1F58B", "1F58A", "1F58C", "1F58D", "1F4DD", "1F4C1", "1F4C2", "1F5C2", "1F4C5", "1F4C6", "1F5D2", "1F5D3", "1F4C7", "1F4C8", "1F4C9", "1F4CA", "1F4CB", "1F4CC", "1F4CD", "1F4CE", "1F587", "1F4CF", "1F4D0", "2702", "1F5C3", "1F5C4", "1F5D1", "1F512", "1F513", "1F50F", "1F510", "1F511", "1F5DD", "1F528", "26CF", "2692", "1F6E0", "1F5E1", "2694", "1F52B", "1F6E1", "1F527", "1F529", "2699", "1F5DC", "2697", "2696", "1F517", "26D3", "1F489", "1F48A", "1F6AC", "26B0", "26B1", "1F5FF", "1F6E2", "1F52E", "1F6A9", "1F38C", "1F3F4", "1F3F3", "1F3F3"],
+			activity: ["1F47E", "1F574", "1F3AA", "1F3AD", "1F3A8", "1F3B0", "1F6C0", "1F397", "1F39F", "1F3AB", "1F396", "1F3C6", "1F3C5", "26BD", "26BE", "1F3C0", "1F3D0", "1F3C8", "1F3C9", "1F3BE", "1F3B1", "1F3B3", "1F3CF", "1F3D1", "1F3D2", "1F3D3", "1F3F8", "1F3AF", "26F3", "26F8", "1F3A3", "1F3BD", "1F3BF", "1F3C7", "26F7", "1F3C2", "1F3CC", "1F3C4", "1F6A3", "1F3CA", "26F9", "1F3CB", "1F6B4", "1F6B5", "1F3AE", "1F3B2", "1F3B7", "1F3B8", "1F3BA", "1F3BB", "1F3AC", "1F3F9"],
+			symbols: ["1F441", "1F498", "2764", "1F493", "1F494", "1F495", "1F496", "1F497", "1F499", "1F49A", "1F49B", "1F49C", "1F49D", "1F49E", "1F49F", "2763", "1F4A4", "1F4A2", "1F4AC", "1F5EF", "1F4AD", "1F4AE", "2668", "1F488", "1F55B", "1F567", "1F550", "1F55C", "1F551", "1F55D", "1F552", "1F55E", "1F553", "1F55F", "1F554", "1F560", "1F555", "1F561", "1F556", "1F562", "1F557", "1F563", "1F558", "1F564", "1F559", "1F565", "1F55A", "1F566", "1F300", "2660", "2665", "2666", "2663", "1F004", "1F3B4", "1F507", "1F508", "1F509", "1F50A", "1F4E2", "1F4E3", "1F4EF", "1F514", "1F515", "1F3E7", "1F6AE", "1F6B0", "267F", "1F6B9", "1F6BA", "1F6BB", "1F6BC", "1F6BE", "26A0", "1F6B8", "26D4", "1F6AB", "1F6B3", "1F6AD", "1F6AF", "1F6B1", "1F6B7", "1F51E", "2622", "2623", "2B06", "2197", "27A1", "2198", "2B07", "2199", "2B05", "2196", "2195", "2194", "21A9", "21AA", "2934", "2935", "1F503", "1F504", "1F519", "1F51A", "1F51B", "1F51C", "1F51D", "1F6D0", "269B", "1F549", "2721", "2638", "262F", "271D", "2626", "262A", "262E", "1F54E", "1F52F", "267B", "1F4DB", "1F530", "1F531", "2B55", "2705", "2611", "2714", "2716", "274C", "274E", "2795", "2796", "2797", "27B0", "27BF", "303D", "2733", "2734", "2747", "203C", "2049", "2753", "2754", "2755", "2757", "A9", "AE", "2122", "2648", "2649", "264A", "264B", "264C", "264D", "264E", "264F", "2650", "2651", "2652", "2653", "26CE", "1F500", "1F501", "1F502", "25B6", "23E9", "25C0", "23EA", "1F53C", "23EB", "1F53D", "23EC", "23F9", "1F3A6", "1F505", "1F506", "1F4F6", "1F4F3", "1F4F4", "23", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "1F51F", "1F4AF", "1F520", "1F521", "1F522", "1F523", "1F524", "1F170", "1F18E", "1F171", "1F191", "1F192", "1F193", "2139", "1F194", "24C2", "1F195", "1F196", "1F17E", "1F197", "1F17F", "1F198", "1F199", "1F19A", "1F201", "1F202", "1F237", "1F236", "1F22F", "1F250", "1F239", "1F21A", "1F232", "1F251", "1F238", "1F234", "1F233", "3297", "3299", "1F23A", "1F235", "25AA", "25AB", "25FB", "25FC", "25FD", "25FE", "2B1B", "2B1C", "1F536", "1F537", "1F538", "1F539", "1F53A", "1F53B", "1F4A0", "1F532", "1F533", "26AA", "26AB", "1F534", "1F535"],
+			misc1: ['1f52f', '1f3e7', '1f4b9', '1f4b2', '1f4b1', 'a9', 'ae', '2122', '274c', '203c', '2049', '2757', '2753', '2755', '2754', '2b55', '1f51d', '1f51a', '1f519', '1f51b', '1f51c', '1f503', '1f55b', '1f567', '1f550', '1f55c', '1f551', '1f55d', '1f552', '1f55e', '1f553', '1f55f', '1f554', '1f560', '1f555', '1f556', '1f557', '1f558', '1f559', '1f55a', '1f561', '1f562', '1f563', '1f564', '1f565', '1f566', '2716', '2795', '2796', '2797', '2660', '2665', '2663', '2666', '1f4ae', '1f4af', '2714', '2611', '1f518', '1f517', '27b0', '3030', '303d', '1f531', '25fc', '25fb', '25fe', '25fd', '25aa', '25ab', '1f53a', '1f532', '1f533', '26ab', '26aa', '1f534', '1f535', '1f53b', '2b1c', '2b1b', '1f536', '1f537', '1f538', '1f539'],
 			dingbatsAndMore: (function () {
 				var base = ['2588', '2318'], more = [[0x2600, 0x2647], [0x2654, 0x266F], [0xb0, 0xb0]], i;
 
@@ -412,28 +468,22 @@ Changes
 				return base;
 			}())
 		},
-		create: function (point) {
-			var a = document.createElement('a');
-			a.innerHTML = '&#x' + point + ';';
-			a.setAttribute('data-char', a.innerHTML);
-			a.title = 'U+' + point; // a.innerHTML;
-			a.href = 'https://codepoints.net/U+' + point;
-			return a;
-		},
-		injectTo: function (div) {
-			var e, i, l, f = document.createDocumentFragment();
-			for (e in this.db) {
-				if (this.db.hasOwnProperty(e)) {
-					l = this.db[e];
-					for (i = 0; i < l.length; i++) {
-						f.appendChild(this.create(l[i]));
-						f.appendChild(document.createTextNode(' '));
-					}
-				}
-			}
-			div.appendChild(f);
-		},
 		events: {
+			toolbar: function (e, parent) {
+				e.preventDefault();
+
+				var css = '.gm_emoji_' + e.target.getAttribute('data-toolbar'), div = parent.querySelector(css);
+
+				Array.from(parent.querySelectorAll('.gm_emoji_list:not(.gm_emoji_hidden):not(' + css + ')'))
+					.forEach(function (e) { e.classList.add('gm_emoji_hidden'); });
+
+
+				Array.from(parent.querySelectorAll('.gm_emoji_toolbar_button'))
+					.forEach(function (e) { e.classList.remove('gm_emoji_selected'); });
+
+				e.target.classList.toggle('gm_emoji_selected');
+				div.classList.toggle('gm_emoji_hidden');
+			},
 			insert: function (e, textarea) {
 				var target = e.target.hasAttribute('data-char') ? e.target : e.target.parentElement, start, end, pre, post, emo;
 				if (textarea.selectionStart < 0) { return; }
@@ -453,6 +503,11 @@ Changes
 			},
 			wire: function (div, textarea) {
 				div.addEventListener('click', function (e) {
+					if (e.target.hasAttribute('data-toolbar')) {
+						emoji.events.toolbar(e, div);
+						return;
+					}
+
 					if (e.which === 1) {
 						e.preventDefault();
 						emoji.events.insert(e, textarea);
@@ -463,10 +518,15 @@ Changes
 		make: function (parent, textarea) {
 			var div = $.e('div', { className: 'gm_emoji' });
 			parent.appendChild(div);
-			this.injectTo(div);
+			this.presentation.panel(div);
 			this.events.wire(div, textarea);
 		},
 		css: (function () {
+
+			update.css('.gm_emoji_selected { opacity: .7; } .gm_emoji_toolbar_button { cursor: pointer; }');
+			update.css('.gm_emoji_hidden { display: none; }');
+			update.css('.gm_emoji_toolbar > div { display: inline-block; width: 15px; }');
+
 			/* Windows Chromium Browser Emoji Fix
 			 * Emoji in Chrome-based browsers!
 			 *
@@ -639,11 +699,11 @@ Changes
 	// Form Maker
 	Form = (function () {
 
-		function Form(id, el, message, title, edit, reason) {
-			if (!id || !el) { return; }
+		function Form(id, parent, message, title, edit, reason) {
+			if (!id || !parent) { return; }
 
 			this.id = id;
-			this.el = el;
+			this.el = parent;
 			this.message = $.h(message || '');
 			this.title = $.h(title || '');
 			this.edit = !!edit;
@@ -668,7 +728,7 @@ Changes
 
 		Form.shared = {
 			elements: {
-				main: document.getElementById('main'),
+				main: document.querySelector('#main .wrap'),
 				closed: !!document.querySelector('a.large-button.disabled'),
 				logged: document.querySelector('#usercptools'),
 				postbits: function () { return document.querySelectorAll('.postbit:not(.ignored):not([data-qqre])'); },
