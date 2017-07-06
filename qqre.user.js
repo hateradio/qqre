@@ -34,7 +34,7 @@
 
 ## 10
 * **New**: Emoji toolbar to toggle which emoji to display
-* **New**: Adds the [NOPARSE] tag -- won't parse any BBCode within it
+* **New**: Adds the `[NOPARSE]` tag -- won't parse any BBCode within it
 * **Fix**: Posts without user names won't stop the script execution
 
 Changes

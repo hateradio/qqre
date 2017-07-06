@@ -7,7 +7,7 @@
 
 Install it from Greasy Fork . . . [https://greasyfork.org/en/scripts/1022-neogaf-quick-quote-reply-and-edit](https://greasyfork.org/en/scripts/1022-neogaf-quick-quote-reply-and-edit "Quick Quote, Reply &amp; Edit - Install")
 
-Check out the source . . . [https://github.com/hateradio/wbb](https://github.com/hateradio/qqre "Quick Quote, Reply &amp; Edit - Source Code")
+Check out the source . . . [https://github.com/hateradio/qqre](https://github.com/hateradio/qqre "Quick Quote, Reply &amp; Edit - Source Code")
 
 <strike>Chrome users, [get the extension](https://chrome.google.com/webstore/detail/neogaf-quick-quote-reply/cepaobafibbkpibaddehcnldhcnjjgal)!</strike>
 
@@ -42,7 +42,7 @@ Windows 7 users who have issues displaying Emoji should install the [Symbola](ht
 
 ## New: Version 10
 * **New**: Emoji toolbar to toggle which emoji to display
-* **New**: Adds the [NOPARSE] tag -- won't parse any BBCode within it
+* **New**: Adds the `[NOPARSE]` tag -- won't parse any BBCode within it
 * **Fix**: Posts without user names won't stop the script execution
 
 ## Version 9
