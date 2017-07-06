@@ -130,7 +130,7 @@ Changes
 (function () {
 	'use strict';
 
-	var $, greaseWindow, strg, update, Extra, Editor, Form, app, bond, emoji;
+	var $, greaseWindow, strg, update, Extra, Editor, Form, app, bond, emoji, dom;
 
 	if (!String.prototype.trim) { String.prototype.trim = function () { return this.replace(/^\s+|\s+$/g, ''); }; }
 	if (!Array.from) { Array.from = function (list) { return Array.prototype.slice.call(list); }; }
@@ -147,6 +147,24 @@ Changes
 	}
 
 	bond = function (o, m) { return function () { return m.apply(o, arguments); }; };
+
+	dom = {
+		top: document.head || document.body,
+		css: function (t) {
+			if (!this.style) {
+				this.style = document.createElement('style');
+				this.style.type = 'text/css';
+				this.top.appendChild(this.style);
+			}
+			this.style.appendChild(document.createTextNode(t + '\n'));
+		},
+		js: function (t) {
+			var j = document.createElement('script');
+			j.type = 'text/javascript';
+			j[/^https?\:\/\//i.test(t) ? 'src' : 'textContent'] = t;
+			this.top.appendChild(j);
+		}
+	};
 
 	// UCS-2 Decoder https://github.com/bestiejs/punycode.js
 	function ucs2decode(string) {
@@ -196,70 +214,53 @@ Changes
 	// U P D A T E HANDLE
 	update = {
 		name: 'NeoGAF: Quick Quote, Reply, and Edit',
-		version: 1000,
+		version: 10000,
 		key: 'ujs_QQRE_UPDT',
 		callback: 'qqreupdater',
 		page: 'https://greasyfork.org/scripts/1022-neogaf-quick-quote-reply-and-edit',
-		uric: 'https://hateradio.github.io/qqre/update.json',
-		checkchrome: true,
+		urij: 'https://hateradio.github.io/qqre/update.json',
 		interval: 5,
 		day: (new Date()).getTime(),
-		time: function () {return (new Date(this.day + (1000 * 60 * 60 * 24 * this.interval))).getTime(); },
-		top: document.head || document.getElementsByTagName('head')[0],
-		css: function (t) {
-			if (!this.style) {
-				this.style = document.createElement('style');
-				this.style.type = 'text/css';
-				this.top.appendChild(this.style);
-			}
-			this.style.appendChild(document.createTextNode(t + '\n'));
-		},
-		js: function (t) {
-			var j = document.createElement('script');
-			j.type = 'text/javascript';
-			j[/^https?\:\/\//i.test(t) ? 'src' : 'textContent'] = t;
-			this.top.appendChild(j);
-		},
+		time: function () { return new Date(this.day + (1000 * 60 * 60 * 24 * this.interval)).getTime(); },
 		notification: function (j) {
-			if (j) {
-				if (this.version < j.version) {
-					window.localStorage.setItem(this.key,
-						JSON.stringify({date: this.time(), version: j.version, page: j.page }));
-				} else {
-					return true;
-				}
+			if (this.version < j.version) {
+				strg.save(this.key, { date: this.time(), version: j.version, page: j.page });
+				this.link();
 			}
-			var a = document.createElement('a'), b = JSON.parse(window.localStorage.getItem(this.key));
-			a.href = b.page || '#';
-			a.target = '_blank';
-			a.id = 'userscriptupdater';
-			a.title = 'Update Now!';
-			a.textContent = 'An update for ' + this.name + ' is available.';
-			document.body.appendChild(a);
-			return true;
 		},
-		check: function (force) {
-			if (this.extension) { return; }
-			if (!strg.on) { return; } // || typeof (GM_updatingEnabled) === 'boolean'
-			var stored = strg.read(this.key), j, page;
+		link: function () {
 			this.csstxt();
-			if (force || !stored || stored.date < this.day) {
-				page = stored && stored.page ? stored.page : this.page;
+
+			var a = document.createElement('a'), b = strg.read(this.key);
+			a.href = b.page || '#';
+			a.id = 'userscriptupdater2';
+			a.title = 'Update now.';
+			a.target = '_blank';
+			a.textContent = 'An update for ' + this.name + ' is available.';
+			a.addEventListener('click', function () { this.style.display = 'none'; }, false);
+			document.body.appendChild(a);
+		},
+		xhr: function () {
+			var x = new XMLHttpRequest();
+			x.addEventListener('load', function () { update.notification(JSON.parse(this.responseText)); }, false);
+			x.open('get', update.urij, true);
+			x.send();
+		},
+		check: function (opt) {
+			if (!strg.on) { return; }
+			var stored = strg.read(this.key), page;
+
+			if (opt || !stored || stored.date < this.day) {
+				page = (stored && stored.page) || '#';
 				strg.save(this.key, {date: this.time(), version: this.version, page: page});
-				j = this.notification.toString()
-					.replace('function', 'function ' + this.callback)
-					.replace('this.version', this.version)
-					.replace(/(?:this\.key)/g, "'" + this.key + "'")
-					.replace('this.time()', this.time())
-					.replace('this.name', "'" + this.name + "'");
-				this.js(j);
-				this.js(this.uric);
-			} else if (this.version < stored.version) { this.notification(); }
+				this.xhr();
+			} else if (this.version < stored.version) {
+				this.link();
+			}
 		},
 		csstxt: function () {
-			if (!this.pop) { this.pop = true; this.css('#userscriptupdater,#userscriptupdater:visited{box-shadow:0 0 6px #787878;border:1px solid #777;border-radius:4px;cursor:pointer;color:#555;font-family:Arial, Verdana, sans-serif;font-size:11px;font-weight:700;text-align:justify;min-height:45px;position:fixed;z-index:999999;right:10px;top:10px;width:170px;background:#ebebeb url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACsAAACLCAYAAAD4QWAuAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2RpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1NUIzQjc3MTI4N0RFMDExOUM4QzlBNkE2NUU3NDJFNCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpGN0Q1OEQyNjdEQzUxMUUwQThCNEE3MTU1NDU1NzY2OSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpGN0Q1OEQyNTdEQzUxMUUwQThCNEE3MTU1NDU1NzY2OSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IFdpbmRvd3MiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo1NUIzQjc3MTI4N0RFMDExOUM4QzlBNkE2NUU3NDJFNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo1NUIzQjc3MTI4N0RFMDExOUM4QzlBNkE2NUU3NDJFNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Po6YcvQAAAQFSURBVHja7JzBSxRRHMdnp+gkiLdOgtshKGSljQVF8CK0biEErYfwFmT+BQpdA0MIBEFtTx2qSxESaAt5ioUQFDp5sjl06rbnumzfp7+VbZx5M+/Nb9wZ+f3g56wzO28//ua93/u9J/stdDodx2/P3o85llaFT8JvwlvwTfhf00a2Hv8IPO86PHYHvg//An8OfwRfg/9RfzvTZ7DBvoZXQq6p6D7MCuwT+N2I92zAB/sNO0yPO8quwxf7DasABmK+d0XTVVKHnYIvG96z1i9Ymw8ep/R2obAqNdkm41e2sFct71v1/f4BiXyOJpRpHKZ918s9527B5+FvLwJWDaoR3zmvZ/bZw2HPNyMeBOTeb/BfaXaDEuVMvx2G3QDQMkW21wZsUpkp7GbIeU9zz3TI+WXTVGYCW6XRbApb1lxbTwt2VVMltS1hVWRnuWFVqhoNudbW9NchHIpc+ToO7GDE49JFtRij/ZG4gy0O7CIVIjZWNuhiw0lhK1SA6GzI8ppxKouCjTNaOWC7qWzKFrYaNw/SQOKwNVtYk4KjyAQ7RpnHCHaeCg7ugZQon7sBj3RYM62mHdmTVAaGxbiRNVmqRM3/bUvgDQCX/CcLvZsceEOF1v82dgPTrkdVVp2iXU8Q4e9ob0IHu59gUecxdwdlMwBunusGAJ1NuPr0KLoFdYQ3GGBXAiMLWC9gBRDX2gTa9g3Wp7Rbk8TqaPfjWWRp9I0kaLARVCbiXMO/xLGwdfCd7Oa4eDGQdD0fYYcJ7z/bzXHpxbWEDRaddO1FF3aSobE6pazAawztX0H7465mXWVqB2hwqWdwFeFfGaM+Wlh4V/rkMO2fpmy3VWTf5AD0NzLLkYsfn53T7fUs21k2UPmw5jBs9qZgx/AH4Ns+VxvQwJg0rGXTMPUfnhYgj0MLmayb6+TIBFZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBVZgBTZzVrg3U+Nsz1iTo7m7c+GRFU2ONGBFkyMNWNHkSANWNDl0xqbJAZ+j1/nR5HBOv6zm/8JaPjQ5KKqiyRFVpORfk8PRf3NZq8lRrd3PhiaHc6pvcLk0ORDdfGlyAFg0OdKAPUlliG76mhyGUNaDLXOaHIjuJdXkoKVKXzU5wlJZZjU5AFyKKhErFkuVbjcoUo3Apcmhnu6Ebkcmc5oczd2dZlA3YNHkUAFwUtLkcJlWnm1a1ng94AvkbKnM1SxVTKwRMphYNDkAPNiFFU0OZuPV5NDMYiyaHOgKvJoc8CVftFk1ORRsi/FxvYR3yH9qZjYba+VGkwOTw5GCzZcmByzTmhyI6ra/kNkiz4wmByD/0+T4J8AAyDkZArebBxMAAAAASUVORK5CYII=) no-repeat 13px 15px;padding:12px 20px 10px 65px}#userscriptupdater:hover,#userscriptupdater:visited:hover{color:#55698c!important;background-position:13px -85px;border-color:#8f8d96}'); }
-		},
-		extension: window.chrome && window.chrome.extensions
+			if (!this.pop) { this.pop = true; dom.css('#userscriptupdater2,#userscriptupdater2:visited{box-shadow:1px 1px 6px #7776;border-bottom:3px solid #d65e55;cursor:pointer;color:#555;font-family:sans-serif;font-size:12px;font-weight:700;text-align:justify;position:fixed;z-index:999999;right:10px;top:10px;background:#ebebeb url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTguODQ4NTMgMTk5LjM4MzA3Ij48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNC4yNzYgLTE2LjM2NykiPjxjaXJjbGUgY3g9IjEwNC4zMjEiIGN5PSIxMTYuMzI3IiByPSI5OC4yNzQiIGZpbGw9IiNkNjVlNTUiLz48cGF0aCBmaWxsPSIjZTljZTAyIiBzdHJva2U9IiNlOWM4MDIiIHN0cm9rZS13aWR0aD0iMTYuNyIgZD0iTTE2Ni40NSAxNTcuMzEySDQxLjg5bDMxLjE0LTUzLjkzNSAzMS4xNC01My45MzUgMzEuMTM3IDUzLjkzNXoiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48dGV4dCB4PSI4NS42NDMiIHk9IjE1MS44NjYiIGZpbGw9IiNkNjVlNTUiIHN0cm9rZS13aWR0aD0iMS40NzciIHN0eWxlPSJsaW5lLWhlaWdodDoxLjI1Oy1pbmtzY2FwZS1mb250LXNwZWNpZmljYXRpb246J0Jvb2sgQW50aXF1YSciIGZvbnQtd2VpZ2h0PSI0MDAiIGZvbnQtc2l6ZT0iNTkuMDg4IiBmb250LWZhbWlseT0iQm9vayBBbnRpcXVhIiBsZXR0ZXItc3BhY2luZz0iMCIgd29yZC1zcGFjaW5nPSIwIj48dHNwYW4geD0iODUuNjQzIiB5PSIxNTEuODY2IiBzdHlsZT0iLWlua3NjYXBlLWZvbnQtc3BlY2lmaWNhdGlvbjonQm9vayBBbnRpcXVhJyIgZm9udC13ZWlnaHQ9IjcwMCIgZm9udC1zaXplPSIxMjYuMDU0Ij4hPC90c3Bhbj48L3RleHQ+PC9nPjwvc3ZnPg==) no-repeat 10px center;background-size:40px;padding:0 20px 0 60px;height:55px;line-height:55px}#userscriptupdater2:hover,#userscriptupdater2:visited:hover{color:#b33a3a !important;border-color:#ce4b30}'); }
+		}
 	};
 	update.check();
 
@@ -378,7 +379,7 @@ Changes
 		};
 		return Extra;
 	}());
-	update.css('td.imgbtnemu div:hover { border:1px solid #316ac5; margin: -1px; background: #c1d2ee; } td.imgbtnemu div:active { background: #98b5e2; } #vB_Editor_001_cmd_wrap0_spoiler { visibility:hidden !important } .quickreplyform_hotspot{text-align:center;margin-top:6px} .text_emo_container { text-align: center; margin-top: 8px; } .text_emo_container > div {vertical-align: top} .text_emo_container .text_emo_container_text {display:inline-block;margin: 0 0 0 4%;width:64%} .text_emo_container .text_emo_container_emo {width:24%;margin: 0 0 0 1%;display:inline-block;overflow:hidden} .text_emo_container_text textarea {width:99%} .gm_emoji {line-height: 1.2;overflow: hidden;resize:both} .gm_emoji a {font-size:12px;line-height:1.2;cursor:pointer} .gm_emoji_list {display:inline} .gm_emoji_box {height: 9.6em; overflow: auto; } .gm_emoji_toolbar { margin-bottom: 4px } .gm_emoji_search{margin:5px 0;height:1.3em;line-height:1.3em;background:rgba(255, 255, 255, .5)}');
+	dom.css('td.imgbtnemu div:hover { border:1px solid #316ac5; margin: -1px; background: #c1d2ee; } td.imgbtnemu div:active { background: #98b5e2; } #vB_Editor_001_cmd_wrap0_spoiler { visibility:hidden !important } .quickreplyform_hotspot{text-align:center;margin-top:6px} .text_emo_container { text-align: center; margin-top: 8px; } .text_emo_container > div {vertical-align: top} .text_emo_container .text_emo_container_text {display:inline-block;margin: 0 0 0 4%;width:64%} .text_emo_container .text_emo_container_emo {width:24%;margin: 0 0 0 1%;display:inline-block;overflow:hidden} .text_emo_container_text textarea {width:99%} .gm_emoji {line-height: 1.2;overflow: hidden;resize:both} .gm_emoji a {font-size:12px;line-height:1.2;cursor:pointer} .gm_emoji_list {display:inline} .gm_emoji_box {height: 9.6em; overflow: auto; } .gm_emoji_toolbar { margin-bottom: 4px } .gm_emoji_search{margin:5px 0;height:1.3em;line-height:1.3em;background:rgba(255, 255, 255, .5)}');
 
 	// Emoji Stuff <3 OSX 10.9+ Command+Control+Space
 	// http://konieczny.be/article/utf.php
@@ -594,9 +595,9 @@ Changes
 		},
 		css: (function () {
 
-			update.css('.gm_emoji_selected { opacity: .7; } .gm_emoji_toolbar_button { cursor: pointer; }');
-			update.css('.gm_emoji_hidden { display: none !important; }');
-			update.css('.gm_emoji_toolbar > div { display: inline-block; }');
+			dom.css('.gm_emoji_selected { opacity: .7; } .gm_emoji_toolbar_button { cursor: pointer; }');
+			dom.css('.gm_emoji_hidden { display: none !important; }');
+			dom.css('.gm_emoji_toolbar > div { display: inline-block; }');
 
 			/* Windows Chromium Browser Emoji Fix
 			 * Emoji in Chrome-based browsers!
@@ -607,7 +608,7 @@ Changes
 			 * Find it here: http://users.teilar.gr/~g1951d/
 			 */
 			if (window.chrome) { // && /(?:win)/i.test(navigator.platform)
-				update.css('.post, .postbit-post, .normal, textarea, input, .gm_emoji, a { font-family: "Helvetica Neue", sans-serif, "Apple Color Emoji", "Android Emoji", "Segoe UI Emoji", "Segoe UI Symbol", Symbola; }');
+				dom.css('.post, .postbit-post, .normal, textarea, input, .gm_emoji, a { font-family: "Helvetica Neue", sans-serif, "Apple Color Emoji", "Android Emoji", "Segoe UI Emoji", "Segoe UI Symbol", Symbola; }');
 			}
 		}())
 	};
@@ -1229,7 +1230,7 @@ Changes
 			},
 			quickReply: function () {
 				if (Form.token() && !Form.shared.elements.closed) {
-					update.css('.quickreplyformp div.vBulletin_editor { background: transparent; border: 0; padding: 0 } #quickreplybox { position:fixed; top:0; left:0; width: 100%; background: transparent; text-align: center; } #quickreplybox span { background: #4aa4b7; color: #fff; padding: 3px; border-radius: 3px } #quickreplybox span:hover { background: #47a947; cursor: pointer} .hide { display: none; } .newreplybox { font-family: Arial, Verdana, sans-serif; max-width: 800px; margin: auto; padding: 9px 8px 6px} .inpost .newreplybox { width: 90% !important; border: 1px solid #ccc} .quickreplyformp textarea {font-size:110%; display:block; margin: auto} .newreplybox .vBulletin_editor { border: 0 none !important; } .newreplybox p { margin: .5em 0 .1em; text-align: center} .quickquotes, .quickquoted { cursor: pointer; background: url(' + app.assets.button + ') no-repeat; -moz-background-size: 16px 16px; background-size: 16px 16px; width:16px; height:16px; margin-right:2px; transition-duration: .2s; } .quickquotes:hover{opacity:.8} .quickquotes:active,.quickquoted,.quickquoted:hover{opacity:.5} #quickreplyformpoff { position: fixed; z-index: 1000; top: 28px; left: 150px; } #vB_Editor_001 { border: none; background: transparent; margin: 0; padding: 0 } \n.newreplybox .imagebutton { border: 0 !important; padding: 1px !important; margin: 0 2px;} .resize_merger.imagebutton { background: transparent !important; padding: 0 !important; vertical-align: middle; } .newreplybox .imagebutton:hover img { background-color: #C1D2EE; border-radius: 2px } .newreplybox .control { text-align:center; padding: 0px; margin: 4px auto 2px auto; } .newreplybox .control > div { display:inline-block } .newreplybox .large-button.submit:focus { outline: none;border-radius:3px; background-color:#01518E; border:0; color:#eee;} .newreplybox .large-button.submit:active{ outline: none; border-radius: 3px; background-color:#666; border:0; color:#fff; } \n.post { min-height: 108px } .editarea .newreplybox { width: 650px; margin: 12px 6px } .editarea textarea { width: 99% !important; } .editarea textarea, .biginput { border:1px solid #bbb } .newreplybox input[type="radio"],.newreplybox input[type="checkbox"]{width:13px;height:13px;padding:0;margin:0 0 0 4px;position:relative;top:-1px;}.inpost .newreplybox{width: 94%} .qqre_shortcuts {font-weight:bold;cursor:pointer} .qqre_shortcuts:hover {text-decoration:underline}  #qqreshortcuts { margin: 5px auto; padding: 0; text-align: center; width:500px} #qqreshortcuts li {text-align:left; display: inline-block; padding: 0 3px; width:7em} #qqreshortcuts li:last-child{text-align:center;display:block;width:auto} #vB_Editor_001_cmd_wrap0_spoiler { visibility:hidden !important } .qqreb {line-height:1.2;color:#333;font-family:"Andale Mono",Consolas,monospace;background: none repeat scroll 0 0 rgba(248, 245, 245, 0.62); border: 1px solid #b1b1b1; border-radius: 3px; display: inline-block; padding: 0 5px; }');
+					dom.css('.quickreplyformp div.vBulletin_editor { background: transparent; border: 0; padding: 0 } #quickreplybox { position:fixed; top:0; left:0; width: 100%; background: transparent; text-align: center; } #quickreplybox span { background: #4aa4b7; color: #fff; padding: 3px; border-radius: 3px } #quickreplybox span:hover { background: #47a947; cursor: pointer} .hide { display: none; } .newreplybox { font-family: Arial, Verdana, sans-serif; max-width: 800px; margin: auto; padding: 9px 8px 6px} .inpost .newreplybox { width: 90% !important; border: 1px solid #ccc} .quickreplyformp textarea {font-size:110%; display:block; margin: auto} .newreplybox .vBulletin_editor { border: 0 none !important; } .newreplybox p { margin: .5em 0 .1em; text-align: center} .quickquotes, .quickquoted { cursor: pointer; background: url(' + app.assets.button + ') no-repeat; -moz-background-size: 16px 16px; background-size: 16px 16px; width:16px; height:16px; margin-right:2px; transition-duration: .2s; } .quickquotes:hover{opacity:.8} .quickquotes:active,.quickquoted,.quickquoted:hover{opacity:.5} #quickreplyformpoff { position: fixed; z-index: 1000; top: 28px; left: 150px; } #vB_Editor_001 { border: none; background: transparent; margin: 0; padding: 0 } \n.newreplybox .imagebutton { border: 0 !important; padding: 1px !important; margin: 0 2px;} .resize_merger.imagebutton { background: transparent !important; padding: 0 !important; vertical-align: middle; } .newreplybox .imagebutton:hover img { background-color: #C1D2EE; border-radius: 2px } .newreplybox .control { text-align:center; padding: 0px; margin: 4px auto 2px auto; } .newreplybox .control > div { display:inline-block } .newreplybox .large-button.submit:focus { outline: none;border-radius:3px; background-color:#01518E; border:0; color:#eee;} .newreplybox .large-button.submit:active{ outline: none; border-radius: 3px; background-color:#666; border:0; color:#fff; } \n.post { min-height: 108px } .editarea .newreplybox { width: 650px; margin: 12px 6px } .editarea textarea { width: 99% !important; } .editarea textarea, .biginput { border:1px solid #bbb } .newreplybox input[type="radio"],.newreplybox input[type="checkbox"]{width:13px;height:13px;padding:0;margin:0 0 0 4px;position:relative;top:-1px;}.inpost .newreplybox{width: 94%} .qqre_shortcuts {font-weight:bold;cursor:pointer} .qqre_shortcuts:hover {text-decoration:underline}  #qqreshortcuts { margin: 5px auto; padding: 0; text-align: center; width:500px} #qqreshortcuts li {text-align:left; display: inline-block; padding: 0 3px; width:7em} #qqreshortcuts li:last-child{text-align:center;display:block;width:auto} #vB_Editor_001_cmd_wrap0_spoiler { visibility:hidden !important } .qqreb {line-height:1.2;color:#333;font-family:"Andale Mono",Consolas,monospace;background: none repeat scroll 0 0 rgba(248, 245, 245, 0.62); border: 1px solid #b1b1b1; border-radius: 3px; display: inline-block; padding: 0 5px; }');
 
 					app.views.editLinks();
 					if (Form.canAdd()) {
