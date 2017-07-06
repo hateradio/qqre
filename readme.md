@@ -1,7 +1,7 @@
 # Quick Quote, Reply & Edit
 
 ## Preview
-![Quick Quote, Reply & Edit](screenshot.png "Version 10 Preview")
+![Quick Quote, Reply & Edit](https://raw.githubusercontent.com/hateradio/qqre/master/screenshot.png "Version 10 Preview")
 
 ## Links
 
