@@ -40,6 +40,10 @@ Mac users can use the CMD (⌘) key instead of CTRL.
 ## Windows 7 Users
 Windows 7 users who have issues displaying Emoji should install the [Symbola](http://users.teilar.gr/~g1951d/) font on their system.
 
+## 10.0.1
+* **Fix**: Search input now matches the style of the site
+* **Fix**: Quick Editor now toggling correctly
+
 ## New: Version 10
 * **New**: Emoji toolbar to toggle which emoji to display
 * **New**: Adds the `[NOPARSE]` tag -- won't parse any BBCode within it
