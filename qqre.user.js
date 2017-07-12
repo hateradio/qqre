@@ -3,7 +3,7 @@
 // @name           NeoGAF: Quick Quote, Reply, and Edit
 // @namespace      hateradio)))
 // @author         hateradio
-// @version        10.0.1
+// @version        10.0.2
 // @description    This script adds the ability to quickly quote, reply, and edit posts on NeoGAF. Just click and go.
 // @homepage       https://greasyfork.org/scripts/1022-neogaf-quick-quote-reply-and-edit
 // @icon           data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2RpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpGRjg5NTBEMDYwODdFMDExQkE4RUNGOEQ3QzZENjU2MyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo1NzUyNDZBRTg3RDkxMUUwQkE0Q0QyRjcyMEQwQUNDOCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo1NzUyNDZBRDg3RDkxMUUwQkE0Q0QyRjcyMEQwQUNDOCIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IFdpbmRvd3MiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5RTgyRDgxNkQ5ODdFMDExOTI4RUREM0QyQUUxREY5NyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpGRjg5NTBEMDYwODdFMDExQkE4RUNGOEQ3QzZENjU2MyIvPiA8L3JkZjpEZXNjcmlwdGlv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
@@ -27,30 +27,38 @@
 
 // @grant          GM_log
 
-// @updated        06 JUL 2017
+// @updated        11 JUL 2017
 // @since          30 OCT 2010
 // (c) 2010+, hateradio
 // ==/UserScript==
 
 /*
 
-## 10.0.1
+## Updates
+
+### 10.0.2
+* **New**: Adds Grunt for task management -- generates readme.md and update.json
+* **Fix**: Safari - Shortcuts now work
+* - Note: `CMD+M` and `CMD+H` cannot be overriden. Please use `CTRL+H` and `CTRL+M`
+* **Fix**: Safari - Textareas in PMs now display
+* Removed extraneous elements and added `placeholder` text to input fields
+
+### 10.0.1
 * **Fix**: Search input now matches the style of the site
 * **Fix**: Quick Editor now toggling correctly
 
-## 10
+### 10
 * **New**: Emoji toolbar to toggle which emoji to display
 * **New**: Adds the `[NOPARSE]` tag -- won't parse any BBCode within it
 * **Fix**: Posts without user names won't stop the script execution
 
-Changes
-## 9.0.2
+### 9.0.2
 * **FIX**: HTTPS for NeoGAF
 
-## 9.0.1
+### 9.0.1
 * **FIX**: Saved text would appear in the title field instead of the textarea.
 
-## 9.0
+### 9.0
 *  **New**: Keyboard toggle for images in quotes is now ALT+SHIFT+T instead of ALT+T for greater compatibility.
 *  **New**: Improved shortcuts for Mac (eg, CMD+B for Bold)
 *  **New**: Temporary storage saves text as it is written.
@@ -69,9 +77,7 @@ Changes
 *  Renames "Delete" button with "Clear"
 *  Restructure of the code base
 
-// todo implement preview
-
-## 8.0
+### 8.0
 
 *  **New**: Emoji picker!
 *  **New**: (Windows) Emoji support to Chrome-based browsers!
@@ -81,56 +87,65 @@ Changes
 *  **New**: USC-2 decoder and entity encoder to work with forum AJAX to transmit Emoji data
 *  **Fix**: Removing recursive quotes no longer causes an error
 
-<strong>7.4.1</strong>
-<ul>
-<li>Chrome fix for greaseWindow</li>
-</ul>
-<strong>7.4</strong>
-<ul>
-<li>Fixes quotes when user has ignored others</li>
-<li>Fixes for getting user key</li>
-</ul>
-<strong>7.3</strong>
-<ul>
-<li>Fixes update notification</li>
-<li>Closed threads do not show the reply box</li>
-<li>Changes to form to match new dark theme</li>
-<li>Improves quick quote text replacements</li>
-</ul>
-<strong>7.1 - 7.2</strong>
-<ul>
-<li>Changes for Chrome extension</li>
-<li>Changes to form to match new dark theme</li>
-<li>Improves quick quote text replacements</li>
-</ul>
-<strong>7.0</strong>
-<ul>
-<li>Fix for new site</li>
-<li>Fix for quick reply AJAX response (no more responseXML)</li>
-</ul>
-6.3
-<ul>
-<li>Chrome 27+, no more window access</li>
-<li>Added message listener</li>
-<li>Chanced to dropboxusercontent.com, since it's now used by dropbox</li>
-</ul>
-6.1.2 - 6.2
-<ul><li>Chrome - button issues, again</li></ul>
-6.1
-<ul><li>Chrome - button issues</li></ul>
+### 7.4.1
 
-<h4>6.0</h4> 4,156
-<ul>
-	<li><b>Removes quick reply bar, now uses the native button to create the quick editor;</b></li>
-	<li><b>The editor starts when pressing the Edit+ link</b></li>
-	<li>Incorporates some of the site's native AJAX functionality</li>
-	<li>[IMG] to [URL] replacement now creates "Link : Image" when an image is inside a link</li>
-	<li>Fixes integration with Smilies script, data image links will be removed</li>
-	<li>Updates the Extra reply button code</li>
-	<li>Enhances compatibility with Opera</li>
-	<li>Adds keyboad shortcut list</li>
-	<li>Adds keyboard shortcut (ALT+T) for toggling "Auto-convert IMG to URL tags" checkbox</li>
-</ul>
+*   Chrome fix for greaseWindow
+
+### 7.4
+
+*   Fixes quotes when user has ignored others
+*   Fixes for getting user key
+
+### 7.3
+
+*   Fixes update notification
+*   Closed threads do not show the reply box
+*   Changes to form to match new dark theme
+*   Improves quick quote text replacements
+
+### 7.1 - 7.2
+
+*   Changes for Chrome extension
+*   Changes to form to match new dark theme
+*   Improves quick quote text replacements
+
+### 7.0
+
+*   Fix for new site
+*   Fix for quick reply AJAX response (no more `responseXML`)
+
+### 6.3
+
+*   Chrome 27+, no more `window` access
+*   Added message listener
+*   Chanced to dropboxusercontent.com, since it's now used by dropbox
+
+### 6.1.2 - 6.2
+
+*   Chrome - button issues, again
+
+### 6.1
+
+*   Chrome - button issues
+
+### 6.0
+
+*   Removes quick reply bar, now uses the native button to create the quick editor
+*   The editor starts when pressing the Edit+ link
+*   Incorporates some of the site's native AJAX functionality
+*   [IMG] to [URL] replacement now creates "Link : Image" when an image is inside a link
+*   Fixes integration with Smilies script, data image links will be removed
+*   Updates the Extra reply button code
+*   Enhances compatibility with Opera
+*   Adds keyboad shortcut list
+*   Adds keyboard shortcut (`ALT+T`) for toggling "Auto-convert IMG to URL tags" checkbox
+
+(DLs: 4,156)
+
+// #Updates
+// todo implement preview
+
+
 */
 
 (function () {
@@ -220,7 +235,7 @@ Changes
 	// U P D A T E HANDLE
 	update = {
 		name: 'NeoGAF: Quick Quote, Reply, and Edit',
-		version: 10010,
+		version: 10020,
 		key: 'ujs_QQRE_UPDT',
 		callback: 'qqreupdater',
 		page: 'https://greasyfork.org/scripts/1022-neogaf-quick-quote-reply-and-edit',
@@ -316,11 +331,15 @@ Changes
 		Extra.moz = window.InstallTrigger !== undefined;
 		Extra.keyEvent = Extra.moz ? 'keypress' : 'keydown';
 		Extra.click = function (el) {
-			var evt = document.createEvent('MouseEvents');
-			evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-			// window.setTimeout(function () {
-			el.dispatchEvent(evt);
-			// }, 1);
+            try {
+                el.click();
+            } catch (e) {
+                var evt = document.createEvent('MouseEvents');
+                evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                // window.setTimeout(function () {
+                el.dispatchEvent(evt);
+                // }, 1);
+            }
 		};
 
 		Extra.prototype = {
@@ -385,7 +404,7 @@ Changes
 		};
 		return Extra;
 	}());
-	dom.css('td.imgbtnemu div:hover { border:1px solid #316ac5; margin: -1px; background: #c1d2ee; } td.imgbtnemu div:active { background: #98b5e2; } #vB_Editor_001_cmd_wrap0_spoiler { visibility:hidden !important } .quickreplyform_hotspot{text-align:center;margin-top:6px} .text_emo_container { text-align: center; margin-top: 8px; } .text_emo_container > div {vertical-align: top} .text_emo_container .text_emo_container_text {display:inline-block;margin: 0 0 0 4%;width:64%} .text_emo_container .text_emo_container_emo {width:24%;margin: 0 0 0 1%;display:inline-block;overflow:hidden} .text_emo_container_text textarea {width:99%} .gm_emoji {line-height: 1.2;overflow: hidden;resize:both} .gm_emoji a {font-size:12px;line-height:1.2;cursor:pointer} .gm_emoji_list {display:inline} .gm_emoji_box {height: 9.6em; overflow: auto; } .gm_emoji_toolbar { margin-bottom: 4px } .gm_emoji_search{margin:5px 0;box-sizing:border-box;width:100%}');
+	dom.css('td.imgbtnemu div:hover { border:1px solid #316ac5; margin: -1px; background: #c1d2ee; } td.imgbtnemu div:active { background: #98b5e2; } #vB_Editor_001_cmd_wrap0_spoiler { visibility:hidden !important } .quickreplyform_hotspot{text-align:center;margin-top:6px} .text_emo_container { text-align: center; margin-top: 8px; } .text_emo_container > div {vertical-align: top} .text_emo_container .text_emo_container_text {display:inline-block;margin: 0 0 0 4%;width:64%} .text_emo_container .text_emo_container_emo {width:24%;min-width:180px;margin: 0 0 0 1%;display:inline-block;overflow:hidden;font-size:13px} .text_emo_container_text textarea {width:99%} .gm_emoji {line-height: 1.3;overflow: hidden;resize:both} .gm_emoji a {font-size:13px;line-height:1.3;cursor:pointer} .gm_emoji_list {display:inline} .gm_emoji_box {height: 100px; overflow: auto; } .gm_emoji_toolbar { margin-bottom: 4px } .gm_emoji_search{margin:5px 0;box-sizing:border-box;width:95%}');
 
 	// Emoji Stuff <3 OSX 10.9+ Command+Control+Space
 	// http://konieczny.be/article/utf.php
@@ -452,6 +471,7 @@ Changes
 				search = document.createElement('input');
 				search.setAttribute('type', 'text');
 				search.className = 'biginput gm_emoji_search';
+				search.placeholder = 'Search';
 
 				emos = document.createElement('div');
 				emos.className = 'gm_emoji_box';
@@ -542,19 +562,19 @@ Changes
 				div.classList.remove('gm_emoji_hidden');
 			},
 			search: function (e) {
-				var title = this.value.trim(), reg;
+				var title = this.value.trim(), reg, div = this.parentElement;
 
-				Array.from(document.querySelectorAll('.gm_emoji_list.gm_emoji_hidden'))
+				Array.from(div.querySelectorAll('.gm_emoji_list.gm_emoji_hidden'))
 					.forEach(function (e) { e.classList.remove('gm_emoji_hidden'); });
 
 				if (title.length === 0) {
-					Array.from(document.querySelectorAll('.gm_emoji_list a.gm_emoji_hidden')).forEach(function (e) {
+					Array.from(div.querySelectorAll('.gm_emoji_list a.gm_emoji_hidden')).forEach(function (e) {
 						e.classList.remove('gm_emoji_hidden');
 					});
 				} else {
 					reg = new RegExp(title, 'ig');
 
-					Array.from(document.querySelectorAll('.gm_emoji_list a')).forEach(function (e) { // a:not([title*='${title}' i])
+					Array.from(div.querySelectorAll('.gm_emoji_list a')).forEach(function (e) { // a:not([title*='${title}' i])
 						if (reg.test(e.title)) {
 							// console.log(e.title);
 							e.classList.remove('gm_emoji_hidden');
@@ -562,6 +582,8 @@ Changes
 							e.classList.add('gm_emoji_hidden');
 						}
 					});
+
+					div.querySelector('.gm_emoji_box').scrollTop = 0;
 				}
 			},
 			insert: function (e, textarea) {
@@ -1051,11 +1073,9 @@ Changes
 				emoji.make(container.querySelector('.text_emo_container_emo'), this.elements.message);
 
 				if (this.edit) {
-					this.elements.reason = $.e('input', {className: 'biginput', type: 'text', title: 'Optional', maxlength: 125, size: 50, name: 'reason', value: this.reason}, p);
-					$.e('small', {title: 'Reason for editing.', _cursor: 'help', textContent: ' Reason'}, p);
+					this.elements.reason = $.e('input', {className: 'biginput', type: 'text', title: 'Optional', maxlength: 125, size: 50, name: 'reason', value: this.reason, placeholder: 'Reason for editing'}, p);
 				} else {
-					this.elements.title = $.e('input', {size: 50, name: 'title', className: 'biginput', type: 'text', value: this.title}, p);
-					$.e('small', {title: 'Optionally, set a title for your post.', _cursor: 'help', textContent: ' Title'}, p);
+					this.elements.title = $.e('input', {size: 50, name: 'title', className: 'biginput', type: 'text', value: this.title, placeholder: 'Title'}, p);
 				}
 
 				$.e('input', {type: 'hidden', name: 'securitytoken', id: '', value: Form.token()}, r);
@@ -1226,13 +1246,15 @@ Changes
 				container = $.e('div', {innerHTML: '<div class="text_emo_container"><div class="text_emo_container_text"></div><div class="text_emo_container_emo"></div></div>'});
 
 				container.querySelector('.text_emo_container_text').appendChild(textarea);
-				textarea.style = '';
+				textarea.removeAttribute('style');
 				parent.appendChild(container);
 				emoji.make(container.querySelector('.text_emo_container_emo'), textarea);
 
 				id = textarea.id.match(/vB_Editor_(\w+)_/)[1];
 
-				document.getElementById('vB_Editor_001_save').addEventListener('click', Form.events.submit, false);
+				if (document.getElementById('vB_Editor_001_save')) {
+					document.getElementById('vB_Editor_001_save').addEventListener('click', Form.events.submit, false);
+				}
 
 				return new Extra(id);
 			},
