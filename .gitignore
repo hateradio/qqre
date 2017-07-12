@@ -10,3 +10,4 @@ test/
 *.iml
 target/
 *.map
+node_modules/

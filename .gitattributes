@@ -1,5 +1,6 @@
 *         text=auto
 *.js      eof=lf
+*.md      eof=lf
 
 *.png     binary
 *.jpeg    binary
