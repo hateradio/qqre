@@ -45,6 +45,11 @@ Windows 7 users who have issues displaying Emoji should install the [Symbola](ht
 
 ## Updates
 
+### 10.1
+* **New**: Adds new emoji!
+* **Fix**: Inserting emoji will no longer add a space between emoji
+* Adds ESLint support
+
 ### 10.0.2
 * **New**: Adds Grunt for task management -- generates readme.md and update.json
 * **Fix**: Safari - Shortcuts now work

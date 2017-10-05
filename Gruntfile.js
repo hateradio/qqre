@@ -12,7 +12,7 @@ module.exports = function(grunt) {
     let version, rawVersion, updateVersion;
 
     version = js.match(/version\s+(\d+.+)/)[1];
-    rawVersion = version.replace(/[.]/g, '') + '0';
+    rawVersion = (version.replace(/[.]/g, '') + '000').substr(0, 5);
     updateVersion = js.match(/version\:\s?(\d+)/)[1];
 
     return {
